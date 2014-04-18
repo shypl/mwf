@@ -1,0 +1,26 @@
+<project name="Mouse Wheel Fix" default="build">
+
+	<target name="compile js">
+		<java jar="build/closure-compiler.jar" dir="${basedir}" fork="true" failonerror="true">
+			<jvmarg value="-Dfile.encoding=UTF-8"/>
+			<arg value="--js"/>
+			<arg value="src/org/shypl/mwf/Adapter.js"/>
+			<arg value="--js_output_file"/>
+			<arg value="src/org/shypl/mwf/Adapter.min.js"/>
+		</java>
+	</target>
+
+	<target name="build" depends="compile js">
+		<property environment="env"/>
+		<property name="FLEX_HOME" value="${env.FLEX_HOME}"/>
+
+		<java jar="${FLEX_HOME}/lib/compc.jar" dir="${basedir}" fork="true" failonerror="true">
+			<jvmarg value="-Dfile.encoding=UTF-8"/>
+			<arg value="+flexlib=${FLEX_HOME}/frameworks"/>
+			<arg value="-source-path+=src"/>
+			<arg value="-include-sources=src"/>
+			<arg value="-output=bin/shypl-mwf.swc"/>
+		</java>
+	</target>
+
+</project>
