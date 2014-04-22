@@ -1,5 +1,4 @@
-package org.shypl.mwf
-{
+package org.shypl.mwf {
 	import flash.display.DisplayObject;
 	import flash.display.InteractiveObject;
 	import flash.display.Stage;
@@ -11,14 +10,12 @@ package org.shypl.mwf
 	import flash.geom.Point;
 	import flash.text.TextField;
 
-	public class MouseWheelFix
-	{
+	public class MouseWheelFix {
 		private static var _inited:Boolean = false;
 		private static var _stage:Stage;
 		private static var _disableDefault:Boolean;
 
-		public static function init(stage:Stage):Boolean
-		{
+		public static function init(stage:Stage):Boolean {
 			if (_inited) {
 				throw new IllegalOperationError("MouseWheelFix already initialized");
 			}
@@ -50,8 +47,7 @@ package org.shypl.mwf
 			return true;
 		}
 
-		private static function handleWheel(deltaX:int, deltaY:int, ctrlKey:Boolean, altKey:Boolean, shiftKey:Boolean):Boolean
-		{
+		private static function handleWheel(deltaX:int, deltaY:int, ctrlKey:Boolean, altKey:Boolean, shiftKey:Boolean):Boolean {
 			if (deltaX == 0 && deltaY == 0) {
 				return false;
 			}
@@ -82,8 +78,7 @@ package org.shypl.mwf
 			return event.isDefaultPrevented();
 		}
 
-		private static function stage_mouseWheelHandler(event:MouseEvent):void
-		{
+		private static function stage_mouseWheelHandler(event:MouseEvent):void {
 			if (!(event is MouseWheelFixEvent)) {
 				if (_disableDefault || event.delta === 0) {
 					event.stopPropagation();
@@ -92,8 +87,7 @@ package org.shypl.mwf
 			}
 		}
 
-		private static function stage_fullScreenHandler(event:FullScreenEvent):void
-		{
+		private static function stage_fullScreenHandler(event:FullScreenEvent):void {
 			_disableDefault = !event.fullScreen;
 		}
 	}
