@@ -8,6 +8,7 @@
 			<arg value="--js_output_file"/>
 			<arg value="src/org/shypl/mwf/Adapter.min.js"/>
 		</java>
+		<replaceregexp file="src/org/shypl/mwf/Adapter.min.js" flags="s" match=";$" replace="" />
 	</target>
 
 	<target name="build" depends="compile js">
