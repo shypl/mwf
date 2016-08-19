@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.shypl</groupId>
+	<artifactId>mwf</artifactId>
+	<version>1.1.0-SNAPSHOT</version>
+	<packaging>swc</packaging>
+
+	<name>Mouse Wheel Fix</name>
+	<url>https://github.com/shypl/mwf.git</url>
+
+	<scm>
+		<connection>scm:git:https://github.com/shypl/mwf.git</connection>
+		<developerConnection>scm:git:https://github.com/shypl/mwf.git</developerConnection>
+		<url>https://github.com/shypl/mwf</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>shypl-releases</id>
+			<url>http://nexus.shypl.org/content/repositories/releases/</url>
+		</repository>
+		<snapshotRepository>
+			<id>shypl-snapshots</id>
+			<url>http://nexus.shypl.org/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>shypl-thirdparty</id>
+			<url>http://nexus.shypl.org/content/repositories/thirdparty/</url>
+		</repository>
+		<repository>
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>shypl-thirdparty</id>
+			<url>http://nexus.shypl.org/content/repositories/thirdparty/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>sonatype</id>
+			<url>https://oss.sonatype.org/content/repositories/releases/</url>
+		</pluginRepository>
+	</pluginRepositories>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<flash.flexSdk>4.15.0</flash.flexSdk>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.adobe.flash.framework</groupId>
+			<artifactId>playerglobal</artifactId>
+			<version>12.0</version>
+			<type>swc</type>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.flex</groupId>
+			<artifactId>framework</artifactId>
+			<version>${flash.flexSdk}</version>
+			<type>pom</type>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<sourceDirectory>src/main/actionscript</sourceDirectory>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-dependency-plugin</artifactId>
+				<version>2.10</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+						<configuration>
+							<artifactItems>
+								<artifactItem>
+									<groupId>com.google.javascript</groupId>
+									<artifactId>closure-compiler</artifactId>
+									<version>v20160208</version>
+									<type>jar</type>
+									<overWrite>false</overWrite>
+									<destFileName>closure-compiler.jar</destFileName>
+								</artifactItem>
+							</artifactItems>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.4.0</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.basedir}/src/main/javascript</workingDirectory>
+							<executable>java</executable>
+							<arguments>
+								<argument>-jar</argument>
+								<argument>${project.build.directory}/dependency/closure-compiler.jar</argument>
+								<argument>--js</argument>
+								<argument>Adapter.js</argument>
+								<argument>--js_output_file</argument>
+								<argument>Adapter.min.js</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.8</version>
+				<executions>
+					<execution>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<target>
+								<replaceregexp flags="s" match=";$" replace="">
+									<fileset dir="${project.basedir}/src/main/javascript/">
+										<include name="Adapter.min.js"/>
+									</fileset>
+								</replaceregexp>
+							</target>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<plugin>
+				<groupId>net.flexmojos.oss</groupId>
+				<artifactId>flexmojos-maven-plugin</artifactId>
+				<version>7.1.0</version>
+				<extensions>true</extensions>
+
+				<dependencies>
+					<dependency>
+						<groupId>org.apache.flex</groupId>
+						<artifactId>compiler</artifactId>
+						<version>${flash.flexSdk}</version>
+						<type>pom</type>
+					</dependency>
+				</dependencies>
+
+				<configuration>
+					<debug>true</debug>
+				</configuration>
+
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>sources</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<mavenExecutorId>forked-path</mavenExecutorId>
+					<useReleaseProfile>false</useReleaseProfile>
+					<tagNameFormat>@{project.version}</tagNameFormat>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>shnyaka</id>
+			<name>Alexey Chuprina</name>
+			<email>shnyaka@gmail.com</email>
+		</developer>
+	</developers>
+
+</project>
