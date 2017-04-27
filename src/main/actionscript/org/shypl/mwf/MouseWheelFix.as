@@ -65,7 +65,7 @@ package org.shypl.mwf {
 				return false;
 			}
 			
-			const event:MouseWheelFixEvent = new MouseWheelFixEvent(target.mouseX, target.mouseY, ctrlKey, altKey, shiftKey, deltaX, deltaY);
+			const event:MouseEvent = new MouseEvent(MouseEvent.MOUSE_WHEEL, true, true, target.mouseX, target.mouseY, null, ctrlKey, altKey, shiftKey, false, deltaY);
 			
 			if (target is TextField) {
 				TextField(target).scrollH -= deltaX;
